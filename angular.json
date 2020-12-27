@@ -124,5 +124,8 @@
       }
     }
   },
-  "defaultProject": "onboarding-company-app"
+  "defaultProject": "onboarding-company-app",
+  "cli": {
+    "analytics": false
+  }
 }

@@ -1,0 +1,71 @@
+<div class="main">
+  <div class="navigation-steps">
+    <div class="logo-box">
+      <span class="bold">Onboarding</span>
+      <span class="light">Company</span>
+    </div>
+    <ul class="steps" *ngrxLet="stepList$ as list">
+      <ng-container *ngFor="let item of list; index as i; trackBy: trackByFn">
+        <li class="steps__item" #itemRef [ngStyle]="collapse(item, itemRef)">
+          <div
+            class="item"
+            [ngClass]="{
+              progress: item.status === IN_PROGRESS,
+              finished: item.status === FINISHED
+            }">
+            <div
+              class="item--status"
+              *ngIf="item.status === FINISHED; else unfinished">
+              <svg class="icon icon-check">
+                <use href="./assets/icons.svg#icon-check-alt"></use>
+              </svg>
+            </div>
+            <ng-template #unfinished>
+              <div class="item--status"><span class="icon-empty">{{ i + 1 }}</span></div>
+            </ng-template>
+            <div class="item--name">{{ item.title }}</div>
+          </div>
+          <ng-container *ngIf="item.subStep && item.subStep.length > 0">
+            <ul [ngClass]="{ collapsed: item.collapsed }" class="step-nested">
+              <li
+                class="step-nested__item"
+                [ngClass]="{ progress: item.data.status === IN_PROGRESS }"
+                *ngIf="item.data">
+                <span> {{ item.data.title }} </span>
+                <span *ngIf="item.data.status === IN_PROGRESS">&rarr;</span>
+              </li>
+              <ng-container *ngFor="let subStep of item.subStep">
+                <li
+                  [ngClass]="{ progress: subStep.status === IN_PROGRESS }"
+                  class="step-nested__item">
+                  <span> {{ subStep.title }} </span>
+                  <span *ngIf="subStep.status === IN_PROGRESS">&rarr;</span>
+                </li>
+              </ng-container>
+            </ul>
+          </ng-container>
+        </li>
+      </ng-container>
+    </ul>
+  </div>
+  <div class="main-content">
+    <div class="content">
+      <ng-container *ngrxLet="currentStep$ as step">
+        <div #el [ngSwitch]="(selectedStep$ | async).type">
+          <nb-choose-company *ngSwitchCase="type.COMPANY_TYPE"></nb-choose-company>
+          <nb-choose-state *ngSwitchCase="type.STATE"></nb-choose-state>
+          <nb-business-details *ngSwitchCase="type.BUSINESS_DETAILS" ></nb-business-details>
+          <nb-business-details-about *ngSwitchCase="type.BUSINESS_DETAILS_ABOUT"></nb-business-details-about>
+          <nb-team *ngSwitchCase="type.TEAM"></nb-team>
+          <div *ngSwitchDefault>
+            <p class="not-found">No step found for type {{(selectedStep$ | async).title}} :( </p>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn--prev" (click)="prev(step, el)">Previous</button>
+          <button class="btn btn--next" (click)="update(step, el)">Next</button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
