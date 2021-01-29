@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ANIMATE_ELEM } from '../../utils/animationHelper';
 
 @Component({
   selector: 'nb-choose-company',
@@ -7,7 +6,7 @@ import { ANIMATE_ELEM } from '../../utils/animationHelper';
   styleUrls: ['./choose-company.component.scss']
 })
 export class ChooseCompanyComponent implements OnInit {
-  elem = ANIMATE_ELEM;
+
   constructor() { }
 
   ngOnInit(): void {

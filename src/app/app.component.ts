@@ -3,8 +3,6 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'nb-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
-  title = 'onboarding-company-app';
-}
+export class AppComponent {}

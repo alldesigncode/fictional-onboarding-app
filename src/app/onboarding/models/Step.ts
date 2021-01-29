@@ -1,7 +1,7 @@
 export enum Status {
   FINISHED = 'finished',
   IN_PROGRESS = 'inprogress',
-  INACTIVE = 'inactive',
+  INACTIVE = 'inactive'
 }
 
 export interface Steps {
@@ -18,19 +18,20 @@ export interface Step {
   data?: {
     title?: string;
     status?: string;
-  };
+  }
   status?: string;
-  subStep?: SubStep[];
+  subStep?: SubStep[]
 }
 
 export interface SubStep {
   stepIndex: number;
-  parentIndex: number;
+  parentIndex?: number;
   status?: string;
   title: string;
   ready?: boolean;
   type: string;
 }
+
 
 export interface OnboardingState {
   stepIndex: number;

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ComponentStore } from '@ngrx/component-store';
 import { Observable } from 'rxjs';
-import { OnboardingState, Status, Step, SubStep } from './models/Step';
-import { steps } from './data';
+import { steps } from '../data';
+import { OnboardingState, Status, Step, Steps, SubStep } from './models/Step';
 import { Utils } from './utils/stepUtils';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class OnboardingStore extends ComponentStore<OnboardingState> {
       stepIndex: null,
       selectedStep: null,
       selectedSubStep: null,
-      stepsLength: 0
+      stepsLength: 0,
     });
   }
 
@@ -32,10 +32,17 @@ export class OnboardingStore extends ComponentStore<OnboardingState> {
         return subStep;
       }
     }
-  );
+  )
+
+
+  readonly setLength = this.updater((state) => ({
+    ...state,
+    stepsLength: Utils.calculateLength(state.availableSteps)
+  }))
+
 
   readonly finishCurrentStep = this.updater((state) => {
-    let selectedStep = { ...state.selectedStep };
+    let selectedStep = {...state.selectedStep};
     return {
       ...state,
       availableSteps: {
@@ -44,21 +51,21 @@ export class OnboardingStore extends ComponentStore<OnboardingState> {
           ...selectedStep,
           status: Status.FINISHED,
           collapsed: false,
-          ready: true,
-        },
-      },
-    };
+          ready: true
+        }
+      }
+    }
   });
 
   readonly undoCurrentStep = this.updater((state) => {
-    let selectedStep = { ...state.selectedStep } as Step;
+    let selectedStep = {...state.selectedStep} as Step;
     const subStepToModify =
       selectedStep.collapsed &&
       selectedStep.subStep &&
       selectedStep.subStep.length > 0 &&
       selectedStep.subStep.some((s) => s.status === Status.IN_PROGRESS);
 
-    if (subStepToModify) {
+      if (subStepToModify) {
         const subStepArr = [...selectedStep.subStep];
         const ind = subStepArr.findIndex(s => s.status === Status.IN_PROGRESS);
         subStepArr[ind] = {...subStepArr[ind], status: Status.INACTIVE};
@@ -66,31 +73,26 @@ export class OnboardingStore extends ComponentStore<OnboardingState> {
           ...selectedStep,
           subStep: [...subStepArr]
         }
-    }
+      }
 
-    return {
-      ...state,
-      selectedStep: selectedStep,
-      availableSteps: {
-        ...state.availableSteps,
-        [selectedStep.type]: {
-          ...selectedStep,
-          collapsed: subStepToModify ? true : false,
-          status: subStepToModify ? Status.IN_PROGRESS : Status.INACTIVE,
-          ready: false,
-        },
-      },
-    };
-  });
-
-  readonly setLength = this.updater((state) => ({
-    ...state,
-    stepsLength: Utils.calculateLength(state.availableSteps)
-  }))
+      return {
+        ...state,
+        selectedStep: selectedStep,
+        availableSteps: {
+          ...state.availableSteps,
+          [selectedStep.type]: {
+            ...selectedStep,
+            collapsed: subStepToModify ? true : false,
+            status: subStepToModify ? Status.IN_PROGRESS : Status.INACTIVE,
+            ready: false
+          }
+        }
+      }
+  })
 
   /**
    * Finds and updates current step and original object data based on provided step index
-   * @param ind - Step index
+   * @param ind Step index
    */
   readonly updateStep = this.updater((state: OnboardingState, { ind, undo = false }: { ind: number; undo?: boolean }) => {
     const foundStep = {...Utils.findStep(state.availableSteps, ind, state.selectedStep)};
@@ -112,12 +114,9 @@ export class OnboardingStore extends ComponentStore<OnboardingState> {
       availableSteps: {
         ...state.availableSteps,
         [selectedStep.type]: {
-          ...selectedStep,
-        },
-      },
-    };
-  });
+          ...selectedStep
+        }
+      }
+    }
+  })
 }
-
-
-

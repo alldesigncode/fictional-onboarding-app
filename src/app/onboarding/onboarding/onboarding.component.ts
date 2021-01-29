@@ -1,15 +1,8 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { AnimationBuilder } from '@angular/animations';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { STEP_TYPES } from 'src/app/data';
 import { Status, Step } from '../models/Step';
 import { OnboardingStore } from '../onboarding.store';
-import { STEP_TYPES } from '../data';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { AnimationBuilder } from '@angular/animations';
 import { AnimationHelper } from '../utils/animationHelper';
 
 @Component({
@@ -17,34 +10,28 @@ import { AnimationHelper } from '../utils/animationHelper';
   templateUrl: './onboarding.component.html',
   styleUrls: ['./onboarding.component.scss'],
   providers: [OnboardingStore],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OnboardingComponent extends AnimationHelper implements OnInit, OnDestroy {
-  private destroyed$ = new Subject<void>();
+export class OnboardingComponent extends AnimationHelper implements OnInit {
 
   public FINISHED = Status.FINISHED;
   public IN_PROGRESS = Status.IN_PROGRESS;
   public type = STEP_TYPES;
 
-  public length: number;
+  private length: number;
 
-  public currentStep$ = this.store.step$;
   public stepList$ = this.store.stepList$;
+  public currentStepIndex$ = this.store.step$;
   public selectedStep$ = this.store.finalizedStep$;
 
-  constructor(
-    private readonly store: OnboardingStore,
-    protected builder: AnimationBuilder,
-  ) {
-    super(builder);
-  }
+  constructor(private readonly store: OnboardingStore,
+              protected builder: AnimationBuilder) {
+                super(builder);
+              }
 
   ngOnInit(): void {
-    this.store
-      .select((s) => s.stepsLength)
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe((length) => (this.length = length));
-
+    this.store.select((s) => s.stepsLength)
+    .subscribe((length) => (this.length = length));
     this.init();
   }
 
@@ -75,8 +62,8 @@ export class OnboardingComponent extends AnimationHelper implements OnInit, OnDe
       const stepItemHeight = height > 30 ? 30 : height;
 
       return {
-        height: `${stepItemHeight + subStepTotalHeight}px`,
-      };
+        height: `${stepItemHeight + subStepTotalHeight}px`
+      }
     }
   }
 
@@ -94,19 +81,14 @@ export class OnboardingComponent extends AnimationHelper implements OnInit, OnDe
         // final step, cleanup can be done here
         this.store.finishCurrentStep();
       }
-    });
+    })
   }
 
   prev(ind: number, el: HTMLElement) {
     this.animate(this.slideOut, el).onDone(() => {
-        this.store.undoCurrentStep();
-        this.store.updateStep({ ind: ind - 1, undo: true });
-        this.animate(this.slideIn, el);
+      this.store.undoCurrentStep();
+      this.store.updateStep({ ind: ind - 1, undo: true });
+      this.animate(this.slideIn, el);
     })
-  }
-
-  ngOnDestroy() {
-    this.destroyed$.next();
-    this.destroyed$.complete();
   }
 }

@@ -1,4 +1,4 @@
-import { Steps } from './models/Step';
+import { Steps } from "./onboarding/models/Step";
 
 export enum STEP_TYPES {
   COMPANY_TYPE = 'COMPANY_TYPE',

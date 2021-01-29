@@ -6,12 +6,12 @@ const routes: Routes = [
   {
     path: '',
     redirectTo: 'onboarding',
-    pathMatch: 'full',
+    pathMatch: 'full'
   },
   {
     path: 'onboarding',
-    component: OnboardingComponent,
-  },
+    component: OnboardingComponent
+  }
 ];
 
 @NgModule({
